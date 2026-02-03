@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>설정 - 24/365</title>
+    <link rel="stylesheet" href="settings.css" />
+    <link rel="stylesheet" href="header.css" />
+    <style>
+      #alert-overlay {
+        display: none;
+      }
+
+      .alert-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(248, 113, 113, 0.2);
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(4px);
+      }
+      .alert-box {
+        background: white;
+        padding: 36px 48px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+        border: 3px solid #fca5a5;
+      }
+      .alert-box h2 {
+        color: #b91c1c;
+        font-size: 36px;
+        margin-bottom: 16px;
+      }
+      .alert-box button {
+        background-color: #f87171;
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.2s;
+      }
+      .alert-box button:hover {
+        background-color: #ef4444;
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body class="no-scroll">
+    <header class="header">
+      <div class="logo">
+        <img src="logo.png" alt="로고" class="logo-img" />
+        <span>24/365</span>
+      </div>
+
+      <nav class="nav">
+        <a href="home.html">메인</a>
+        <a href="stats.html">통계</a>
+        <a href="records.html">기록</a>
+      </nav>
+
+      <div class="header-right">
+        <img
+          src="notice.png"
+          alt="알림"
+          class="icon-img"
+          onclick="location.href='alarm.html'"
+        />
+        <img
+          src="setting.png"
+          alt="설정"
+          class="icon-img"
+          onclick="location.href='settings.html'"
+        />
+        <img
+          src="user.png"
+          alt="사용자"
+          class="icon-img"
+          onclick="location.href='user-settings.html'"
+        />
+      </div>
+    </header>
+
+    <main class="main-content-with-sidebar">
+      <aside class="settings-sidebar">
+        <div class="sidebar-title">
+          <img src="setting.png" alt="설정" class="sidebar-title-icon" />
+          <span>설정</span>
+        </div>
+        <div class="sidebar-item active" onclick="showContent('users')">
+          <span>사용자 및 권한 관리</span>
+        </div>
+        <div class="sidebar-item" onclick="showContent('equipment')">
+          <span>장비 및 자원 관리</span>
+        </div>
+        <div class="sidebar-item" onclick="showContent('ai-model')">
+          <span>AI 모델 및 운영 관리</span>
+        </div>
+        <div class="sidebar-item" onclick="showContent('system')">
+          <span>시스템 상태 및 진단</span>
+        </div>
+      </aside>
+      <section class="settings-details-area">
+        <div id="users" class="content-section active">
+          <div class="content-box">
+            <div class="info-item">
+              긴급조치 책임자: [모델 관리팀] 팀장 김나무
+            </div>
+            <div class="info-item">(연락처: 010-1234-5678)</div>
+            <div class="info-item">
+              재훈련 실행 권한 : 최고 관리자 그룹 한정
+            </div>
+            <div class="info-item">
+              ! 기록 요구 사항 : 실행 시간, 실행자 계정, 실행 명령 전체, 모델
+              버전, 재훈련 사용 데이터셋 을 불변 기록으로 즉시 저장
+            </div>
+            <div class="info-item">자동 실행 차단 여부 : 활성</div>
+          </div>
+        </div>
+
+        <div id="equipment" class="content-section">
+          <div class="content-box">
+            <div
+              class="expandable-item"
+              onclick="toggleExpand('webcam-status')"
+            >
+              <span class="arrow" id="webcam-status-arrow">▼</span>
+              <span class="expandable-title">전체 웹캠 현황</span>
+            </div>
+            <div class="expandable-content" id="webcam-status-content">
+              <div class="info-item">전체 웹캠 현황: 총 128대</div>
+              <div class="info-item">정상 작동 중 : 120대</div>
+              <div class="info-item">연결 오류: 5대</div>
+              <div class="info-item">서비스 점검 중 : 3대</div>
+            </div>
+
+            <div class="expandable-item" onclick="toggleExpand('webcam-list')">
+              <span class="arrow" id="webcam-list-arrow">▶</span>
+              <span class="expandable-title">웹캠 관리 목록</span>
+            </div>
+            <div class="expandable-content collapsed" id="webcam-list-content">
+              <div class="info-item">웹캠 ID: CAM-UIS-001</div>
+              <div class="info-item">설치구역 : 경상북도 의성군 금성산</div>
+              <div class="info-item">담당자 : 김나무</div>
+              <div class="info-item">현재 상태 : 정상 작동 중</div>
+            </div>
+
+            <div class="info-item static">데이터 보존 기간 설정 : 1년</div>
+
+            <div
+              class="expandable-item"
+              onclick="toggleExpand('database-status')"
+            >
+              <span class="arrow" id="database-status-arrow">▶</span>
+              <span class="expandable-title">데이터베이스 현황</span>
+            </div>
+            <div
+              class="expandable-content collapsed"
+              id="database-status-content"
+            >
+              <div class="info-item">전체 저장 공간: 총 100TB</div>
+              <div class="info-item">현재 사용 공간: 75 TB</div>
+              <div class="info-item">데이터 증가율 : 2TB</div>
+              <div class="info-item">최종 백업 일시: 2025.10.19 12:00:00</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ai-model" class="content-section">
+          <div class="content-box">
+            <div class="info-item static">최종 성능 검증일 : 2025-09-23</div>
+
+            <div class="expandable-item" onclick="toggleExpand('retraining')">
+              <span class="arrow" id="retraining-arrow">▼</span>
+              <span class="expandable-title">모델 재훈련 필요성</span>
+            </div>
+            <div class="expandable-content" id="retraining-content">
+              <div class="info-item">모델 재훈련 필요성 : 보통</div>
+              <div class="info-item">권고 사유 : 오담률 5% 증가</div>
+              <div class="info-item">다음 권고 시점 : 2025. 11.11.예정</div>
+            </div>
+
+            <div class="expandable-item" onclick="toggleExpand('performance')">
+              <span class="arrow" id="performance-arrow">▶</span>
+              <span class="expandable-title">모델 성능 지표 조회</span>
+            </div>
+            <div class="expandable-content collapsed" id="performance-content">
+              <div class="info-item">전체 정확도: 95.8%</div>
+              <div class="info-item">정밀도: 92.5%</div>
+              <div class="info-item">재현율: 97.0%</div>
+              <div class="info-item">F1-Score: 94.7%</div>
+            </div>
+
+            <div class="info-item static">시스템 소프트웨어 버전 : V3.5.2</div>
+          </div>
+        </div>
+
+        <div id="system" class="content-section">
+          <div class="content-box">
+            <div class="info-item">시스템 진단 결과 : 긴급 재훈련 필요</div>
+            <div class="info-item">
+              주요 현상 : 미탐률/오탐률 동시 급증, 예측 결과의 분산도 증가
+            </div>
+            <div class="info-item">진단 근거 : 성능 저하율: 5.8%,</div>
+            <div class="info-item">
+              최신 데이터와의 분포 차이 값이 0.25 초과
+            </div>
+            <div class="info-item">
+              권장 조치 : 긴급 모델 재훈련 즉시 실행 및 재배포,
+            </div>
+            <div class="info-item">훈련 데이터셋 긴급 검토</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="alert-overlay" class="alert-overlay">
+      <div class="alert-box">
+        <h2>🔥 화재 감지 경고! 🔥</h2>
+        <p id="alert-message">
+          AI 서버에서 화재(FIRE)를 감지했습니다! 즉시 확인하세요!
+        </p>
+        <button onclick="closeAlert()">확인 및 경고 끄기</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const SERVER_HOST = "127.0.0.1";
+        const SERVER_PORT = 9000;
+        const WEBSOCKET_URL = `ws://${SERVER_HOST}:${SERVER_PORT}/ws/detections`;
+
+        const alertOverlay = document.getElementById("alert-overlay");
+
+        function startWebSocket() {
+          const socket = new WebSocket(WEBSOCKET_URL);
+
+          socket.onopen = function (e) {
+            console.log("[WebSocket Open] FastAPI 서버에 연결되었습니다.");
+          };
+
+          socket.onmessage = function (event) {
+            const detectionData = JSON.parse(event.data);
+            console.log("🔥 실시간 감지 데이터 수신:", detectionData);
+
+            const isFire =
+              detectionData.is_fire_detected === true ||
+              (detectionData.class_name &&
+                detectionData.class_name.toUpperCase() === "FIRE");
+
+            if (isFire) {
+              showAlert(
+                
+              );
+            }
+          };
+
+          socket.onclose = function (event) {
+            if (!event.wasClean) {
+              setTimeout(startWebSocket, 5000);
+            }
+          };
+
+          socket.onerror = function (error) {
+            console.error("[WebSocket Error]", error);
+          };
+        }
+
+        function showAlert(message) {
+          document.getElementById("alert-message").textContent = message;
+          alertOverlay.style.display = "flex";
+        }
+
+        window.closeAlert = function () {
+          alertOverlay.style.display = "none";
+        };
+
+        window.onload = function () {
+          startWebSocket();
+        };
+      })();
+
+
+      function showContent(sectionId) {
+        document.querySelectorAll(".content-section").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        document.querySelectorAll(".sidebar-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+
+        document.getElementById(sectionId).classList.add("active");
+
+
+        document
+          .querySelector(`.sidebar-item[onclick*="${sectionId}"]`)
+          .classList.add("active");
+      }
+
+
+      function toggleExpand(id) {
+        const content = document.getElementById(id + "-content");
+        const arrow = document.getElementById(id + "-arrow");
+
+        if (content.classList.contains("collapsed")) {
+          content.classList.remove("collapsed");
+          arrow.textContent = "▼";
+        } else {
+          content.classList.add("collapsed");
+          arrow.textContent = "▶";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>24/365</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body class="no-scroll">
+    <div class="login-page">
+      <img src="logo.png" alt="로고" class="logo" />
+
+      <h2 class="logo-text">24/365</h2>
+
+      <div class="login-box">
+        <h1 class="login-title">Login</h1>
+
+        <div class="input-box">
+          <input type="text" id="email" placeholder="이메일 또는 전화" />
+        </div>
+
+        <div class="input-box">
+          <input type="password" id="password" placeholder="비밀번호" />
+          <span id="togglePassword" class="toggle-password">표시</span>
+        </div>
+
+        <p class="forgot-password">비밀번호를 잊으셨나요?</p>
+
+        <button id="loginButton" class="login-button">로그인</button>
+      </div>
+    </div>
+
+    <script>
+      const pwInput = document.getElementById("password");
+      const toggleBtn = document.getElementById("togglePassword");
+
+      toggleBtn.addEventListener("click", () => {
+        if (pwInput.type === "password") {
+          pwInput.type = "text";
+          toggleBtn.textContent = "숨기기";
+        } else {
+          pwInput.type = "password";
+          toggleBtn.textContent = "표시";
+        }
+      });
+
+      document.getElementById("loginButton").addEventListener("click", () => {
+        const email = document.getElementById("email").value.trim();
+        const pw = pwInput.value.trim();
+
+        if (!email || !pw) {
+          alert("이메일과 비밀번호를 모두 입력해주세요!");
+          return;
+        }
+
+        alert("로그인 성공!");
+        window.location.href = "home.html";
+      });
+
+      document.getElementById("password").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          document.getElementById("loginButton").click();
+        }
+      });
+    </script>
+  </body>
+</html>

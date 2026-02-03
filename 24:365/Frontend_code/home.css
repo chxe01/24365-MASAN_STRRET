@@ -1,0 +1,265 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "SeoulNotice", "Pretendard", sans-serif;
+  background-color: #fff;
+  display: block;
+  height: auto;
+}
+
+main {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 80px);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin-top: 20px;
+}
+
+.card {
+  background-color: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.video-container {
+  width: 100%;
+  padding-top: 56.25%;
+  position: relative;
+  background-color: #222;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.video-box-container {
+  position: absolute;
+  inset: 0;
+}
+
+#videoFeed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bounding-box-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bounding-box {
+  position: absolute;
+  border: 3px solid #ef4444;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: opacity 0.2s ease;
+}
+
+.bounding-box.border-orange-400 {
+  border-color: #fb923c;
+}
+
+.bounding-box.border-red-500 {
+  border-color: #ef4444;
+}
+
+.box-label {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.log-box {
+  max-height: 400px;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+}
+
+.sidebar {
+  padding-top: 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fire-alert {
+  animation: status-pulse 1s infinite alternate;
+}
+
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 5px #ef4444, 0 0 15px #ef4444;
+  }
+  100% {
+    box-shadow: 0 0 10px #ef4444, 0 0 30px #ef4444;
+  }
+}
+
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(248, 113, 113, 0.2);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+.alert-box {
+  background: white;
+  padding: 36px 48px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+  border: 3px solid #fca5a5;
+}
+.alert-box h2 {
+  color: #b91c1c;
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+.alert-box button {
+  background-color: #f87171;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.2s;
+}
+.alert-box button:hover {
+  background-color: #ef4444;
+  transform: translateY(-1px);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  margin-top: 80px !important;
+}
+body {
+  margin: 0;
+  font-family: "SeoulNotice", "Pretendard", sans-serif;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.home-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.home-header {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.home-content {
+  font-size: 24px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  margin-top: 24px;
+}
+
+button {
+  border: 1px solid #c0c0c0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #f8f8f8;
+}
+
+.logout-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 12px 24px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .home-header {
+    font-size: 36px;
+  }
+
+  .home-content {
+    font-size: 20px;
+  }
+
+  .logout-btn {
+    top: 16px;
+    right: 16px;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}

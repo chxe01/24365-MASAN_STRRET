@@ -1,0 +1,196 @@
+.login-page {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+body.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+.logo {
+  width: 52px;
+  height: 61px;
+  margin-bottom: 16px;
+  object-fit: contain;
+}
+
+.logo-text {
+  margin: 0 0 48px 0;
+  font-family: "Inter", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  color: #000000;
+  text-align: center;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 570px;
+  padding: 60px 40px 60px;
+  background: #ffffff;
+  box-shadow: 0px 8px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-title {
+  margin: 0 0 40px 0;
+  font-family: "SeoulNotice", "Paperlogy", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 64px;
+  line-height: 75px;
+  color: #000000;
+  text-align: center;
+}
+
+.input-box {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 70px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.input-box input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0 20px;
+  background: transparent;
+  font-family: "SeoulNotice", "Paperlogy", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 24px;
+  color: #000000;
+  box-sizing: border-box;
+}
+
+.input-box input::placeholder {
+  color: #999999;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: "SeoulNotice", "Paperlogy", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 24px;
+  color: #72ad4e;
+  cursor: pointer;
+  user-select: none;
+}
+
+.forgot-password {
+  width: 100%;
+  max-width: 500px;
+  margin: 8px 0 24px 0;
+  text-align: left;
+  font-family: "SeoulNotice", "Paperlogy", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 24px;
+  color: #72ad4e;
+  cursor: pointer;
+}
+
+.login-button {
+  width: 100%;
+  max-width: 500px;
+  height: 70px;
+  background: #72ad4e;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  font-family: "SeoulNotice", "Paperlogy", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 28px;
+  color: #ffffff;
+  transition: background-color 0.2s ease, transform 0.06s ease;
+  box-shadow: 0 4px 12px rgba(114, 173, 78, 0.3);
+}
+
+.login-button:hover {
+  background-color: #5e9741;
+}
+
+.login-button:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 768px) {
+  .login-box {
+    padding: 40px 24px 40px;
+    margin: 0 16px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .login-title {
+    font-size: 48px;
+    line-height: 56px;
+  }
+
+  .logo {
+    width: 42px;
+    height: 49px;
+  }
+
+  .logo-text {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .input-box {
+    height: 60px;
+  }
+
+  .input-box input {
+    font-size: 18px;
+    padding: 0 16px;
+  }
+
+  .toggle-password {
+    font-size: 18px;
+    right: 16px;
+  }
+
+  .forgot-password {
+    font-size: 18px;
+  }
+
+  .login-button {
+    height: 60px;
+    font-size: 22px;
+  }
+}

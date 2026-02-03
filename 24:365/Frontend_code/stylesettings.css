@@ -1,0 +1,208 @@
+body {
+  margin: 0;
+  font-family: "SeoulNotice", sans-serif;
+  background-color: #222222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.page-container {
+  width: 90%;
+  max-width: 1200px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  min-height: 90vh;
+}
+
+.settings-header {
+  background-color: #222222;
+  color: #ffffff;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header-top-left {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.header-main-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header-logo-img {
+  width: 32px;
+  height: auto;
+}
+
+.header-nav {
+  display: flex;
+  gap: 40px;
+}
+
+.header-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.header-nav a:hover {
+  color: #8bc34a;
+}
+
+.header-icons-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.header-icon:hover {
+  opacity: 0.7;
+}
+
+.btn-login,
+.btn-signup {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-login {
+  background-color: transparent;
+  border: 1px solid #8bc34a;
+  color: #ffffff;
+}
+
+.btn-login:hover {
+  background-color: rgba(139, 195, 74, 0.2);
+}
+
+.btn-signup {
+  background-color: #8bc34a;
+  border: 1px solid #8bc34a;
+  color: #ffffff;
+}
+
+.btn-signup:hover {
+  background-color: #7cb342;
+}
+
+.settings-main-content {
+  display: flex;
+  flex: 1;
+  background-color: #ffffff;
+}
+
+.settings-sidebar {
+  width: 300px;
+  border-right: 1px solid #eeeeee;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-item:hover:not(.highlighted) {
+  background-color: #f5f5f5;
+}
+
+.sidebar-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+.sidebar-item span {
+  font-size: 15px;
+  color: #333333;
+  font-weight: 500;
+}
+
+.sidebar-item.highlighted {
+  background-color: #e8f5e9;
+  border-left: 3px solid #8bc34a;
+  padding-left: 17px;
+}
+
+.sidebar-item.highlighted span {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.settings-details-area {
+  flex: 1;
+  padding: 40px;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .page-container {
+    width: 95%;
+  }
+
+  .header-nav {
+    gap: 20px;
+  }
+
+  .settings-sidebar {
+    width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-main-bar {
+    flex-wrap: wrap;
+  }
+
+  .header-nav {
+    gap: 15px;
+  }
+
+  .settings-main-content {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #eeeeee;
+  }
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>24/365</title>
+    <link rel="stylesheet" href="header.css" />
+    <link rel="stylesheet" href="home.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo" onclick="location.href='home.html'">
+        <img src="logo.png" alt="로고" class="logo-img" />
+        <span>24/365</span>
+      </div>
+
+      <nav class="nav">
+        <a href="home.html">메인</a>
+        <a href="stats.html">통계</a>
+        <a href="records.html">기록</a>
+      </nav>
+
+      <div class="header-right">
+        <img
+          src="notice.png"
+          alt="알림"
+          class="icon-img"
+          onclick="location.href='alarm.html'"
+        />
+        <img
+          src="setting.png"
+          alt="설정"
+          class="icon-img"
+          onclick="location.href='settings.html'"
+        />
+        <img
+          src="user.png"
+          alt="사용자"
+          class="icon-img"
+          onclick="location.href='user-settings.html'"
+        />
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="main-content">
+          <h1 class="text-3xl font-bold mb-4 text-gray-800">
+            실시간 감지 모니터링
+          </h1>
+          <div class="card p-0 overflow-hidden">
+            <div class="video-container" id="video-box-container">
+              <div class="video-box-container">
+                <img
+                  id="videoFeed"
+                  alt="실시간 비디오 스트림"
+                  class="w-full h-full object-contain"
+                />
+                <div
+                  id="bounding-box-overlay"
+                  class="bounding-box-overlay"
+                ></div>
+              </div>
+              <div
+                id="videoError"
+                class="absolute inset-0 bg-red-900 bg-opacity-80 flex items-center justify-center text-white text-xl font-bold hidden"
+              >
+                비디오 피드 연결 오류 🚨 서버/카메라 상태를 확인하세요.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="card mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+              시스템 상태
+            </h2>
+            <div class="flex flex-col space-y-4">
+              <div
+                class="flex justify-between items-center p-3 rounded-lg border"
+              >
+                <span class="font-medium text-gray-600">WebSocket 연결</span>
+                <span
+                  id="wsStatus"
+                  class="status-badge bg-yellow-100 text-yellow-800"
+                  >연결 중...</span
+                >
+              </div>
+              <div
+                class="flex justify-between items-center p-3 rounded-lg border"
+              >
+                <span class="font-medium text-gray-600">AI 서버 ID</span>
+                <span id="serverId" class="font-bold text-gray-800">N/A</span>
+              </div>
+              <div
+                class="flex justify-between items-center p-3 rounded-lg border"
+                id="fireStatusContainer"
+              >
+                <span class="font-medium text-gray-600">화재 감지</span>
+                <span
+                  id="fireStatus"
+                  class="status-badge bg-green-100 text-green-800"
+                  >정상</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">
+              실시간 감지 로그
+            </h2>
+            <div id="detectionLog" class="log-box text-sm space-y-2">
+              <p class="text-gray-500">
+                FastAPI 서버가 켜지면 실시간 로그가 표시됩니다...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="alert-overlay" class="alert-overlay">
+      <div class="alert-box">
+        <h2>🔥 화재 감지 경고! 🔥</h2>
+        <p id="alert-message">
+          AI 서버에서 화재(FIRE)를 감지했습니다! 즉시 확인하세요!
+        </p>
+        <button onclick="closeAlert()">확인 및 경고 끄기</button>
+      </div>
+    </div>
+
+    <script>
+      const HOST = "127.0.0.1";
+      const PORT = "9000";
+
+      const VIDEO_FEED_URL = `http://${HOST}:${PORT}/video_feed`;
+      const WEBSOCKET_URL = `ws://${HOST}:${PORT}/ws/detections`;
+
+      const videoFeed = document.getElementById("videoFeed");
+      const videoError = document.getElementById("videoError");
+      const wsStatus = document.getElementById("wsStatus");
+      const fireStatus = document.getElementById("fireStatus");
+      const fireStatusContainer = document.getElementById(
+        "fireStatusContainer"
+      );
+      const serverIdDisplay = document.getElementById("serverId");
+      const detectionLog = document.getElementById("detectionLog");
+      const alertOverlay = document.getElementById("alert-overlay");
+
+      const overlay = document.getElementById("bounding-box-overlay");
+      const videoBoxContainer = document.getElementById("video-box-container");
+      const activeBoxes = {};
+
+      let isVideoError = false;
+
+
+      function handleVideoFeedError() {
+        if (!isVideoError) {
+          console.error(
+            `비디오 피드 URL에 연결할 수 없습니다: ${VIDEO_FEED_URL}`
+          );
+          videoError.classList.remove("hidden");
+          fireStatusContainer.classList.add("fire-alert");
+          updateStatus(fireStatus, "🚨 오류", "bg-red-500 text-white");
+          isVideoError = true;
+        }
+      }
+
+      videoFeed.onerror = handleVideoFeedError;
+      videoFeed.onload = () => {
+        if (isVideoError) {
+          videoError.classList.add("hidden");
+          fireStatusContainer.classList.remove("fire-alert");
+          isVideoError = false;
+        }
+      };
+
+      videoFeed.src = VIDEO_FEED_URL;
+
+
+      function updateStatus(element, text, classes) {
+        element.textContent = text;
+        element.className = "status-badge " + classes;
+      }
+
+      function logDetection(data) {
+        const confidence = data.confidence || 0;
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("ko-KR");
+
+        const logItem = document.createElement("p");
+        logItem.classList.add("p-1", "rounded", "font-medium");
+
+        const classNameUpper = data.class_name
+          ? data.class_name.toUpperCase()
+          : "";
+        const isFire =
+          data.is_fire_detected === true || classNameUpper === "FIRE";
+        const isSmoke =
+          data.is_smoke_detected === true || classNameUpper === "SMOKE";
+
+        let logText = "";
+
+        if (isFire) {
+          logText = `[${timeString}] 불 (${(confidence * 100).toFixed(
+            1
+          )}%) 🔥 (경보)`;
+          logItem.style.backgroundColor = "#fca5a5"; 
+          logItem.style.color = "#7f1d1d"; 
+        } else if (isSmoke) {
+          logText = `[${timeString}] 연기 (${(confidence * 100).toFixed(
+            1
+          )}%) 💨 (주의)`;
+          logItem.style.backgroundColor = "#fdba74"; 
+          logItem.style.color = "#7c2d12"; 
+        } else {
+          const className = data.class_name || "금성산";
+          logText = `[${timeString}] AI 감지: ${className.toUpperCase()} (${(
+            confidence * 100
+          ).toFixed(1)}%)`;
+          logItem.style.backgroundColor = "#e5e7eb"; 
+          logItem.style.color = "#1f2937"; 
+        }
+
+        logItem.textContent = logText;
+
+        if (
+          detectionLog.firstChild &&
+          detectionLog.firstChild.tagName === "P" &&
+          detectionLog.firstChild.textContent.includes("FastAPI 서버")
+        ) {
+          detectionLog.removeChild(detectionLog.firstChild);
+        }
+        detectionLog.prepend(logItem);
+
+        while (detectionLog.childElementCount > 50) {
+          detectionLog.removeChild(detectionLog.lastChild);
+        }
+      }
+
+      function updateFireStatus(isFire, isSmoke) {
+        if (isVideoError) return;
+
+        if (isFire) {
+          updateStatus(
+            fireStatus,
+            "🔥 화재 감지!!",
+            "bg-red-600 text-white fire-alert"
+          );
+          fireStatusContainer.classList.add("fire-alert");
+        } else if (isSmoke) {
+          updateStatus(fireStatus, "💨 연기 주의", "bg-orange-400 text-white");
+          fireStatusContainer.classList.remove("fire-alert");
+        } else {
+          updateStatus(fireStatus, "정상", "bg-green-500 text-white");
+          fireStatusContainer.classList.remove("fire-alert");
+        }
+      }
+
+      function showAlert(message) {
+        document.getElementById("alert-message").textContent = message;
+        alertOverlay.style.display = "flex";
+      }
+
+      window.closeAlert = function () {
+        alertOverlay.style.display = "none";
+      };
+
+      
+      function drawBoundingBox(data) {
+
+        const location_x = parseFloat(data.location_x);
+        const location_y = parseFloat(data.location_y);
+        const box_w = parseFloat(data.box_width); 
+        const box_h = parseFloat(data.box_height);
+        const class_name = (data.class_name || "UNKNOWN").toUpperCase();
+        const confidence = data.confidence;
+
+      
+        if (box_w === 0 || box_h === 0 || isNaN(box_w) || isNaN(box_h)) {
+  
+          overlay.innerHTML = "";
+          Object.keys(activeBoxes).forEach((key) => delete activeBoxes[key]);
+          return;
+        }
+
+      
+        if (isNaN(location_x) || isNaN(location_y)) {
+          console.error(
+            `[BOX DEBUG ERROR] Received data contains NaN after parsing! Check server output for non-numeric coordinates:`,
+            data
+          );
+          return;
+        }
+
+
+        const videoRect = videoFeed.getBoundingClientRect();
+        const videoContainerRect = videoBoxContainer.getBoundingClientRect();
+
+        const width = videoRect.width;
+        const height = videoRect.height;
+
+
+        if (width === 0 || height === 0) {
+          return;
+        }
+
+
+        const pixelW = box_w * width;
+        const pixelH = box_h * height;
+
+
+        const xOffset = videoRect.left - videoContainerRect.left;
+        const yOffset = videoRect.top - videoContainerRect.top;
+
+
+        const pixelX = location_x * width - pixelW / 2 + xOffset;
+        const pixelY = location_y * height - pixelH / 2 + yOffset;
+
+        if (pixelW <= 0 || pixelH <= 0) {
+          return;
+        }
+
+
+        const boxId = "box-" + class_name;
+        let boxElement = activeBoxes[boxId];
+
+
+        if (!boxElement) {
+          boxElement = document.createElement("div");
+          boxElement.id = boxId;
+          boxElement.className = "bounding-box";
+          boxElement.innerHTML = '<div class="box-label"></div>';
+          overlay.appendChild(boxElement);
+          activeBoxes[boxId] = boxElement;
+        }
+
+
+        let boxColorClass = "";
+        let labelColorClass = "";
+        let labelText = `${class_name} (${(confidence * 100).toFixed(0)}%)`;
+
+        if (class_name === "FIRE") {
+          boxColorClass = "border-red-500";
+          labelColorClass = "bg-red-500 text-white";
+        } else if (class_name === "SMOKE") {
+          boxColorClass = "border-orange-400";
+          labelColorClass = "bg-orange-400 text-white";
+        } else {
+
+          if (boxElement.parentNode)
+            boxElement.parentNode.removeChild(boxElement);
+          delete activeBoxes[boxId];
+          return;
+        }
+
+
+        boxElement.className = "bounding-box " + boxColorClass;
+        const labelElement = boxElement.querySelector(".box-label");
+        labelElement.className = "box-label " + labelColorClass + " text-xs";
+
+
+        Object.assign(boxElement.style, {
+          left: `${pixelX}px`,
+          top: `${pixelY}px`,
+          width: `${pixelW}px`,
+          height: `${pixelH}px`,
+        });
+        labelElement.textContent = labelText;
+
+
+        clearTimeout(boxElement.timer);
+        boxElement.timer = setTimeout(() => {
+          boxElement.style.opacity = "0"; 
+          setTimeout(() => {
+            if (boxElement && boxElement.parentNode) {
+              boxElement.parentNode.removeChild(boxElement);
+              delete activeBoxes[boxId];
+            }
+          }, 500); 
+        }, 500);
+
+        boxElement.style.opacity = "1";
+      }
+
+      function startWebSocket() {
+        updateStatus(wsStatus, "연결 중...", "bg-yellow-100 text-yellow-800");
+
+        const socket = new WebSocket(WEBSOCKET_URL);
+
+        socket.onopen = () => {
+          updateStatus(wsStatus, "✅ 연결됨", "bg-green-500 text-white");
+          console.log("WebSocket 연결 성공!");
+        };
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+
+            console.log("[DATA RECEIVED]", data);
+
+            serverIdDisplay.textContent = data.ai_server_id || "N/A";
+
+          
+            const classNameUpper = data.class_name
+              ? data.class_name.toUpperCase()
+              : "";
+            const isFire =
+              data.is_fire_detected === true || classNameUpper === "FIRE";
+            const isSmoke =
+              data.is_smoke_detected === true || classNameUpper === "SMOKE";
+
+            console.log("[FIRE DETECTION CHECK]", {
+              is_fire_detected: data.is_fire_detected,
+              class_name: data.class_name,
+              classNameUpper,
+              isFire,
+            });
+
+            logDetection(data);
+            updateFireStatus(isFire, isSmoke);
+            drawBoundingBox(data);
+
+            if (isFire) {
+              console.log("[SHOWING ALERT] 불 감지됨!");
+              showAlert(
+                
+              );
+            }
+          } catch (e) {
+            console.error("JSON 파싱 오류:", e, event.data);
+          }
+        };
+
+        socket.onclose = (event) => {
+          
+          if (event.code !== 1000) {
+            updateStatus(
+              wsStatus,
+              "❌ 연결 끊김 (재시도 중)",
+              "bg-red-400 text-white"
+            );
+            console.error(
+              `[WebSocket Close] 연결이 비정상적으로 끊겼습니다! 코드: ${event.code}`,
+              event
+            );
+   
+            setTimeout(startWebSocket, 3000);
+          } else {
+            updateStatus(wsStatus, "종료됨", "bg-gray-400 text-white");
+          }
+        };
+
+        socket.onerror = (error) => {
+          console.error("[WebSocket Error]", error);
+      
+        };
+      }
+
+
+
+      window.onload = function () {
+        startWebSocket();
+      };
+    </script>
+  </body>
+</html>

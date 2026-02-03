@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>24/365 - 기록</title>
+    <link rel="stylesheet" href="header.css" />
+    <link rel="stylesheet" href="records.css" />
+    <style>
+      .table-wrap table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table-wrap table th,
+      .table-wrap table td {
+        padding: 12px 14px;
+      }
+
+      .table-wrap table thead tr th:nth-child(1) {
+        width: 20%; 
+        text-align: left;
+        padding-left: 20px;
+      }
+      .table-wrap table thead tr th:nth-child(2) {
+        width: 60%; 
+        text-align: left;
+      }
+      .table-wrap table thead tr th:nth-child(3) {
+        width: 20%; 
+        text-align: center;
+      }
+
+      .table-wrap table tbody tr td:nth-child(1) {
+        text-align: left;
+        padding-left: 20px;
+      }
+      .table-wrap table tbody tr td:nth-child(2) {
+        text-align: left;
+        white-space: normal;
+      }
+      .table-wrap table tbody tr td:nth-child(3) {
+        font-weight: 600;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo" onclick="location.href='home.html'">
+        <img src="logo.png" alt="로고" class="logo-img" />
+        <span>24/365</span>
+      </div>
+
+      <nav class="nav">
+        <a href="home.html">메인</a>
+        <a href="stats.html">통계</a>
+        <a href="records.html">기록</a>
+      </nav>
+
+      <div class="header-right">
+        <img
+          src="notice.png"
+          alt="알림"
+          class="icon-img"
+          onclick="location.href='alarm.html'"
+        />
+        <img
+          src="setting.png"
+          alt="설정"
+          class="icon-img"
+          onclick="location.href='settings.html'"
+        />
+        <img
+          src="user.png"
+          alt="사용자"
+          class="icon-img"
+          onclick="location.href='user-settings.html'"
+        />
+      </div>
+    </header>
+
+    <main>
+      <div class="records-wrapper">
+        <section class="filter-bar">
+          <div class="filter-title">Filter</div>
+          <form id="filterForm" class="filter-controls">
+            <label class="filter-field">
+              <span>날짜</span>
+              <input type="date" id="startDate" />
+            </label>
+
+            <label class="filter-field">
+              <span>산불 대응 단계</span>
+              <select id="stageFilter">
+                <option value="">전체</option>
+                <option value="1단계">1단계</option>
+                <option value="2단계">2단계</option>
+                <option value="3단계">3단계</option>
+                <option value="산불 대응 초기 단계">산불 대응 초기 단계</option>
+              </select>
+            </label>
+
+            <div class="filter-actions">
+              <button type="submit" class="search-btn">검색</button>
+              <button type="button" id="resetFilters" class="reset-btn">
+                초기화
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="table-card">
+          <div class="table-title">2025년 3월 전국 동시다발 산불 이력</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>감지 시각</th>
+                  <th>산불 위치</th>
+                  <th>산불 대응 단계</th>
+                </tr>
+              </thead>
+              <tbody id="recordsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div id="alert-overlay" class="alert-overlay">
+      <div class="alert-box">
+        <h2>🔥 화재 감지 경고! 🔥</h2>
+        <p id="alert-message">
+          AI 서버에서 화재(FIRE)를 감지했습니다! 즉시 확인하세요!
+        </p>
+        <button onclick="closeAlert()">확인 및 경고 끄기</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const SERVER_HOST = "127.0.0.1";
+        const SERVER_PORT = 9000;
+        const WEBSOCKET_URL = `ws://${SERVER_HOST}:${SERVER_PORT}/ws/detections`;
+
+        const alertOverlay = document.getElementById("alert-overlay");
+
+        function startWebSocket() {
+          const socket = new WebSocket(WEBSOCKET_URL);
+
+          socket.onopen = function (e) {
+            console.log("[WebSocket Open] FastAPI 서버에 연결되었습니다.");
+          };
+
+          socket.onmessage = function (event) {
+            const detectionData = JSON.parse(event.data);
+            console.log("🔥 실시간 감지 데이터 수신:", detectionData);
+
+            const isFire =
+              detectionData.is_fire_detected === true ||
+              (detectionData.class_name &&
+                detectionData.class_name.toUpperCase() === "FIRE");
+
+            if (isFire) {
+              showAlert();
+            }
+          };
+
+          socket.onclose = function (event) {
+            if (!event.wasClean) {
+              setTimeout(startWebSocket, 5000);
+            }
+          };
+
+          socket.onerror = function (error) {
+            console.error("[WebSocket Error]", error);
+          };
+        }
+
+        function showAlert(message) {
+          document.getElementById("alert-message").textContent = message;
+          alertOverlay.style.display = "flex";
+        }
+
+        window.closeAlert = function () {
+          alertOverlay.style.display = "none";
+        };
+
+        window.onload = function () {
+          startWebSocket();
+        };
+      })();
+
+      const detectionRecords = [
+        {
+          timestamp: "2025-03-14 10:48",
+          type: "화염",
+          location: "경상북도 청도군 운문면 신원리 산 136",
+          camera: "CAM-UIS-001",
+          status: "알림 발송",
+          statusClass: "warn",
+          unread: true,
+          responseStage: "2단계",
+        },
+        {
+          timestamp: "2025-03-20 14:45",
+          type: "화염",
+          location: "경상남도 사천시 곤명면 송림리 산 51-2",
+          camera: "CAM-UIS-004",
+          status: "오탐",
+          statusClass: "error",
+          unread: false,
+          responseStage: "1단계",
+        },
+        {
+          timestamp: "2025-03-21 15:26",
+          type: "화염",
+          location: "경상남도 산청군 시천면 신천리 산39",
+          camera: "CAM-MSM-003",
+          status: "조치 중",
+          statusClass: "",
+          unread: false,
+          responseStage: "3단계",
+        },
+        {
+          timestamp: "2025-03-28 11:24",
+          type: "미확인",
+          location: "경상북도 의성군 안평면 괴산리 산61",
+          camera: "CAM-UIS-007",
+          status: "조치 중",
+          statusClass: "",
+          unread: true,
+          responseStage: "3단계",
+        },
+        {
+          timestamp: "2025-03-28 14:39",
+          type: "미확인",
+          location: "경상북도 의성군 안계면 용기리 297-3",
+          camera: "CAM-OKS-002",
+          status: "알림 발송",
+          statusClass: "success",
+          unread: false,
+          responseStage: "3단계",
+        },
+        {
+          timestamp: "2025-03-22 12:12",
+          type: "화염",
+          location: "울산광역시 울주군 온양읍 운화리 972-1",
+          camera: "CAM-MCL-010",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "3단계",
+        },
+        {
+          timestamp: "2025-03-23 12:15",
+          type: "연기",
+          location: "경상남도 함양군 유림면 유평리 산 105",
+          camera: "CAM-BYM-005",
+          status: "조치 중",
+          statusClass: "",
+          unread: false,
+          responseStage: "산불 대응 초기 단계",
+        },
+        {
+          timestamp: "2025-03-22 14:02",
+          type: "미확인",
+          location: "경상남도 김해시 한림면 안곡리 산 106",
+          camera: "CAM-BGG-006",
+          status: "감지완료",
+          statusClass: "success",
+          unread: true,
+          responseStage: "2단계",
+        },
+        {
+          timestamp: "2025-03-23 11:53",
+          type: "미확인",
+          location: "충청북도 옥천군 청성면 조천리 740 일원",
+          camera: "CAM-UIS-001",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "2단계",
+        },
+        {
+          timestamp: "2025-03-23 14:05",
+          type: "연기",
+          location: "경기도 동두천시 생연동 산35-3",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "산불 대응 초기 단계",
+        },
+        {
+          timestamp: "2025-03-25 11:54",
+          type: "연기",
+          location: "울산광역시 울주군 언양읍 송대리 산32-1",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "2단계",
+        },
+        {
+          timestamp: "2025-03-25 19:15",
+          type: "연기",
+          location: "경상북도 봉화군 물야면 개단리 산3",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "산불 대응 초기 단계",
+        },
+        {
+          timestamp: "2025-03-25 14:12",
+          type: "연기",
+          location: "전북특별자치도 고창군 성내면 덕산리 44",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "1단계",
+        },
+        {
+          timestamp: "2025-03-25 15:45",
+          type: "연기",
+          location: "충청남도 당진시 순성면 산104-9",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "산불 대응 초기 단계",
+        },
+        {
+          timestamp: "2025-03-26 19:29",
+          type: "연기",
+          location: "대구광역시 달성군 옥포읍 기세리 산157",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "1단계",
+        },
+        {
+          timestamp: "2025-03-26 21:22",
+          type: "연기",
+          location: "전북특별자치도 무주군 부남면 부남로 736",
+          camera: "CAM-AGM-008",
+          status: "감지완료",
+          statusClass: "success",
+          unread: false,
+          responseStage: "2단계",
+        },
+      ];
+
+      (function () {
+        const recordsBody = document.getElementById("recordsBody");
+        const startDateInput = document.getElementById("startDate");
+        const stageFilter = document.getElementById("stageFilter");
+
+        const filterForm = document.getElementById("filterForm");
+        const resetButton = document.getElementById("resetFilters");
+
+        if (!recordsBody || !filterForm) return;
+
+        function filterRecords(event) {
+          if (event) event.preventDefault();
+
+          const startDateString = startDateInput.value;
+          const stageValue = stageFilter.value;
+
+          const filtered = detectionRecords.filter((record) => {
+            const recordDateString = record.timestamp.split(" ")[0];
+
+            if (startDateString && recordDateString !== startDateString) {
+              return false;
+            }
+
+            if (stageValue && record.responseStage !== stageValue) {
+              return false;
+            }
+
+            return true; 
+          });
+
+          renderRecords(filtered);
+        }
+
+        function renderRecords(list) {
+          recordsBody.innerHTML = "";
+
+          if (list.length === 0) {
+            const emptyRow = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 3;
+            cell.textContent = "조건에 맞는 감지 이력이 없습니다.";
+            cell.style.textAlign = "center";
+            cell.style.padding = "24px 0";
+            emptyRow.appendChild(cell);
+            recordsBody.appendChild(emptyRow);
+            return;
+          }
+
+          list.forEach((record) => {
+            const row = document.createElement("tr");
+            row.className = record.unread ? "is-unread" : "is-read";
+
+            row.innerHTML = `
+              <td>${record.timestamp}</td>
+              <td>${record.location}</td> 
+              <td>${record.responseStage || "--"}</td> 
+              `;
+            recordsBody.appendChild(row);
+          });
+        }
+
+        renderRecords(detectionRecords);
+
+        filterForm.addEventListener("submit", filterRecords);
+        resetButton.addEventListener("click", () => {
+          startDateInput.value = "";
+          stageFilter.value = "";
+          renderRecords(detectionRecords);
+        });
+      })();
+    </script>
+  </body>
+</html>

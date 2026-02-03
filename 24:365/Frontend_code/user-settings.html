@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>내 프로필 - 24/365</title>
+    <link rel="stylesheet" href="user-settings.css" />
+    <link rel="stylesheet" href="header.css" />
+    <style>
+      .alert-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(248, 113, 113, 0.2);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(4px);
+      }
+      .alert-box {
+        background: white;
+        padding: 36px 48px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+        border: 3px solid #fca5a5;
+      }
+      .alert-box h2 {
+        color: #b91c1c;
+        font-size: 36px;
+        margin-bottom: 16px;
+      }
+      .alert-box button {
+        background-color: #f87171;
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.2s;
+      }
+      .alert-box button:hover {
+        background-color: #ef4444;
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body class="no-scroll">
+    <header class="header">
+      <div class="logo">
+        <img src="logo.png" alt="로고" class="logo-img" />
+        <span>24/365</span>
+      </div>
+
+      <nav class="nav">
+        <a href="home.html">메인</a>
+        <a href="stats.html">통계</a>
+        <a href="records.html">기록</a>
+      </nav>
+
+      <div class="header-right">
+        <img
+          src="notice.png"
+          alt="알림"
+          class="icon-img"
+          onclick="location.href='alarm.html'"
+        />
+        <img
+          src="setting.png"
+          alt="설정"
+          class="icon-img"
+          onclick="location.href='settings.html'"
+        />
+        <img
+          src="user.png"
+          alt="사용자"
+          class="icon-img"
+          onclick="location.href='user-settings.html'"
+        />
+      </div>
+    </header>
+
+    <main class="main-content-with-sidebar">
+      <aside class="settings-sidebar">
+        <div class="sidebar-title">
+          <img src="user.png" alt="프로필" class="sidebar-title-icon" />
+          <span>내 프로필</span>
+        </div>
+        <div class="sidebar-item active" onclick="showContent('account')">
+          <img src="1.png" alt="계정" class="sidebar-icon" />
+          <span>나의 계정 정보</span>
+        </div>
+        <div class="sidebar-item" onclick="showContent('permissions')">
+          <img src="2.png" alt="권한" class="sidebar-icon" />
+          <span>담당 구역 및 권한</span>
+        </div>
+        <div class="sidebar-item" onclick="showContent('security')">
+          <img src="3.png" alt="보안" class="sidebar-icon" />
+          <span>보안 및 기술 정보</span>
+        </div>
+      </aside>
+      <section class="settings-details-area">
+        <div id="account" class="content-section active">
+          <div class="content-box">
+            <div class="info-item">사용자ID : forest_10</div>
+            <div class="info-item">이름 : 김나무</div>
+            <div class="info-item">소속 기관 : 산림청 OO 관리소</div>
+            <div class="info-item">직책 / 직무 : 산불 감지 담당자</div>
+            <div class="info-item">이메일 : tree@forest.com</div>
+            <div class="info-item">전화번호 : 010-1234-5678</div>
+          </div>
+        </div>
+
+        <div id="permissions" class="content-section">
+          <div class="content-box">
+            <div class="info-item">
+              현재 담당 구역 : 경상북도 의성군 OO 관리소
+            </div>
+            <div class="info-item">관할 구역 코드 : UIS-020-B</div>
+            <div class="info-item">총 관리 면적 : 7,200 ha</div>
+            <div class="info-item">총 할당 웹캠 수 : N개</div>
+            <div class="info-item">현재 권한 레벨 : 산불 감지 담당자</div>
+            <div class="info-item">
+              주요 기능 접근 권한 : 알림 승인 및 처리, 웹캠 모니터링, 통계
+              데이터 열람
+            </div>
+          </div>
+        </div>
+
+        <div id="security" class="content-section">
+          <div class="content-box">
+            <div class="info-item">2단계 인증 설정</div>
+            <div class="info-item">최근 로그인 기록 : 2025.10.29 08:30</div>
+            <div class="info-item">적용 AI 모델 버전 : YOLOv11</div>
+            <div class="info-item">모델 훈련 환경 : H100</div>
+            <div class="info-item">시스템 최종 업데이트 : 2025년 10월 25일</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="alert-overlay" class="alert-overlay">
+      <div class="alert-box">
+        <h2>🔥 화재 감지 경고! 🔥</h2>
+        <p id="alert-message">
+          AI 서버에서 화재(FIRE)를 감지했습니다! 즉시 확인하세요!
+        </p>
+        <button onclick="closeAlert()">확인 및 경고 끄기</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const SERVER_HOST = "127.0.0.1";
+        const SERVER_PORT = 9000;
+        const WEBSOCKET_URL = `ws://${SERVER_HOST}:${SERVER_PORT}/ws/detections`;
+
+        const alertOverlay = document.getElementById("alert-overlay");
+
+        function startWebSocket() {
+          const socket = new WebSocket(WEBSOCKET_URL);
+
+          socket.onopen = function (e) {
+            console.log("[WebSocket Open] FastAPI 서버에 연결되었습니다.");
+          };
+
+          socket.onmessage = function (event) {
+            const detectionData = JSON.parse(event.data);
+            console.log("🔥 실시간 감지 데이터 수신:", detectionData);
+
+            const isFire =
+              detectionData.is_fire_detected === true ||
+              (detectionData.class_name &&
+                detectionData.class_name.toUpperCase() === "FIRE");
+
+            if (isFire) {
+              showAlert(
+                
+              );
+            }
+          };
+
+          socket.onclose = function (event) {
+            if (!event.wasClean) {
+              setTimeout(startWebSocket, 5000);
+            }
+          };
+
+          socket.onerror = function (error) {
+            console.error("[WebSocket Error]", error);
+          };
+        }
+
+        function showAlert(message) {
+          document.getElementById("alert-message").textContent = message;
+          alertOverlay.style.display = "flex";
+        }
+
+        window.closeAlert = function () {
+          alertOverlay.style.display = "none";
+        };
+
+        window.onload = function () {
+          startWebSocket();
+        };
+      })();
+
+      function showContent(sectionId) {
+        document.querySelectorAll(".content-section").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        document.querySelectorAll(".sidebar-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        document.getElementById(sectionId).classList.add("active");
+
+        event.currentTarget.classList.add("active");
+      }
+    </script>
+  </body>
+</html>
